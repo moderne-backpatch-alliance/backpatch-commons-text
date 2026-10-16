@@ -57,6 +57,24 @@ public class StringSubstitutorWithInterpolatorStringLookupTest {
     }
 
     @Test
+    void testJavaScript() {
+        final StringSubstitutor strSubst =
+                new StringSubstitutor(createInterpolatorWithLookups(StringLookupFactory.KEY_SCRIPT,
+                        StringLookupFactory.INSTANCE.scriptStringLookup()));
+
+        Assertions.assertEquals("Hello World!", strSubst.replace("${script:javascript:\"Hello World!\"}"));
+        Assertions.assertEquals("7", strSubst.replace("${script:javascript:3 + 4}"));
+    }
+
+    @Test
+    public void testJavaScript_disabledByDefault() {
+        final StringSubstitutor strSubst = new StringSubstitutor(
+                StringLookupFactory.INSTANCE.interpolatorStringLookup());
+
+        Assertions.assertEquals("${script:javascript:3 + 4}", strSubst.replace("${script:javascript:3 + 4}"));
+    }
+
+    @Test
     public void testLocalHostLookup_Address() throws UnknownHostException {
         final StringSubstitutor strSubst = new StringSubstitutor(
                 StringLookupFactory.INSTANCE.interpolatorStringLookup());
@@ -97,5 +115,12 @@ public class StringSubstitutorWithInterpolatorStringLookupTest {
                 StringLookupFactory.INSTANCE.interpolatorStringLookup());
         final String spKey = "user.name";
         Assertions.assertEquals(System.getProperty(spKey), strSubst.replace("${sys:" + spKey + "}"));
+    }
+
+    private static StringLookup createInterpolatorWithLookups(final String key, final StringLookup lookup) {
+        final Map<String, StringLookup> lookupMap = new HashMap<>();
+        lookupMap.put(key, lookup);
+
+        return StringLookupFactory.INSTANCE.interpolatorStringLookup(lookupMap, null, false);
     }
 }
