@@ -17,12 +17,26 @@
 
 package org.apache.commons.text.lookup;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Provides access to lookups defined in this package.
  * <p>
- * The default lookups are:
+ * Unless explicitly requested otherwise, a set of default lookups are included for convenience with these
+ * variable interpolation methods. These defaults are listed in the table below. However, the exact lookups
+ * included can be configured through the use of the {@value #DEFAULT_STRING_LOOKUPS_PROPERTY} system property.
+ * If present, this system property will be parsed as a comma-separated list of lookup names, with the names
+ * being those defined by the {@link DefaultStringLookup} enum. For example, setting this system property to
+ * {@code "BASE64_ENCODER,ENVIRONMENT"} will only include the
+ * {@link DefaultStringLookup#BASE64_ENCODER BASE64_ENCODER} and {@link DefaultStringLookup#ENVIRONMENT ENVIRONMENT}
+ * lookups. Setting the property to the empty string will cause no defaults to be configured.
+ * Note that not all lookups defined here and in {@link DefaultStringLookup} are included by default.
+ * Specifically, lookups that can execute code (e.g., {@link DefaultStringLookup#SCRIPT SCRIPT}) and those
+ * that can result in contact with remote servers (e.g., {@link DefaultStringLookup#URL URL}) are not included
+ * by default. The current set of default lookups can be accessed directly with {@link #addDefaultStringLookups(Map)}.
  * </p>
  * <table>
  * <caption>Default String Lookups</caption>
@@ -93,22 +107,10 @@ import java.util.Map;
  * <td>1.6</td>
  * </tr>
  * <tr>
- * <td>{@value #KEY_SCRIPT}</td>
- * <td>{@link ScriptStringLookup}</td>
- * <td>{@link #scriptStringLookup()}</td>
- * <td>1.5</td>
- * </tr>
- * <tr>
  * <td>{@value #KEY_SYS}</td>
  * <td>{@link SystemPropertyStringLookup}</td>
  * <td>{@link #systemPropertyStringLookup()}</td>
  * <td>1.3</td>
- * </tr>
- * <tr>
- * <td>{@value #KEY_URL}</td>
- * <td>{@link UrlStringLookup}</td>
- * <td>{@link #urlStringLookup()}</td>
- * <td>1.5</td>
  * </tr>
  * <tr>
  * <td>{@value #KEY_URL_DECODER}</td>
@@ -126,6 +128,28 @@ import java.util.Map;
  * <td>{@value #KEY_XML}</td>
  * <td>{@link XmlStringLookup}</td>
  * <td>{@link #xmlStringLookup()}</td>
+ * <td>1.5</td>
+ * </tr>
+ * </table>
+ *
+ * <table>
+ * <caption>Additional String Lookups (not included by default)</caption>
+ * <tr>
+ * <th>Key</th>
+ * <th>Implementation</th>
+ * <th>Factory Method</th>
+ * <th>Since</th>
+ * </tr>
+ * <tr>
+ * <td>{@value #KEY_URL}</td>
+ * <td>{@link UrlStringLookup}</td>
+ * <td>{@link #urlStringLookup()}</td>
+ * <td>1.5</td>
+ * </tr>
+ * <tr>
+ * <td>{@value #KEY_SCRIPT}</td>
+ * <td>{@link ScriptStringLookup}</td>
+ * <td>{@link #scriptStringLookup()}</td>
  * <td>1.5</td>
  * </tr>
  * </table>
@@ -252,6 +276,17 @@ public final class StringLookupFactory {
     public static final String KEY_XML = "xml";
 
     /**
+     * Name of the system property used to determine the string lookups added by the
+     * {@link #addDefaultStringLookups(Map)} method. Use of this property is only required
+     * in cases where the set of default lookups must be modified. (See the class documentation
+     * for details.)
+     *
+     * @since 1.10
+     */
+    public static final String DEFAULT_STRING_LOOKUPS_PROPERTY =
+            "org.apache.commons.text.lookup.StringLookupFactory.defaultStringLookups";
+
+    /**
      * Clears any static resources.
      *
      * @since 1.5
@@ -268,19 +303,18 @@ public final class StringLookupFactory {
     }
 
     /**
-     * Adds the {@link StringLookupFactory default lookups}.
+     * Adds the default string lookups for this class to {@code stringLookupMap}. The default string
+     * lookups are a set of built-in lookups added for convenience during string interpolation. The
+     * defaults may be configured using the {@value #DEFAULT_STRING_LOOKUPS_PROPERTY} system property.
+     * See the class documentation for details and a list of lookups.
      *
      * @param stringLookupMap
-     *            the map of string lookups.
+     *            the map of string lookups to edit.
      * @since 1.5
      */
     public void addDefaultStringLookups(final Map<String, StringLookup> stringLookupMap) {
         if (stringLookupMap != null) {
-            // "base64" is deprecated in favor of KEY_BASE64_DECODER.
-            stringLookupMap.put("base64", Base64DecoderStringLookup.INSTANCE);
-            for (final DefaultStringLookup stringLookup : DefaultStringLookup.values()) {
-                stringLookupMap.put(stringLookup.getKey(), stringLookup.getStringLookup());
-            }
+            stringLookupMap.putAll(DefaultStringLookupsHolder.INSTANCE.getDefaultStringLookups());
         }
     }
 
@@ -288,7 +322,7 @@ public final class StringLookupFactory {
      * Returns the Base64DecoderStringLookup singleton instance to format the current date with the format given in the
      * key in a format compatible with {@link java.text.SimpleDateFormat}.
      *
-     * @return the DateStringLookup singleton instance.
+     * @return the Base64DecoderStringLookup singleton instance.
      * @since 1.5
      */
     public StringLookup base64DecoderStringLookup() {
@@ -299,7 +333,7 @@ public final class StringLookupFactory {
      * Returns the Base64EncoderStringLookup singleton instance to format the current date with the format given in the
      * key in a format compatible with {@link java.text.SimpleDateFormat}.
      *
-     * @return the DateStringLookup singleton instance.
+     * @return the Base64EncoderStringLookup singleton instance.
      * @since 1.6
      */
     public StringLookup base64EncoderStringLookup() {
@@ -310,7 +344,7 @@ public final class StringLookupFactory {
      * Returns the Base64DecoderStringLookup singleton instance to format the current date with the format given in the
      * key in a format compatible with {@link java.text.SimpleDateFormat}.
      *
-     * @return the DateStringLookup singleton instance.
+     * @return the Base64DecoderStringLookup singleton instance.
      * @since 1.5
      * @deprecated Use {@link #base64DecoderStringLookup()}.
      */
@@ -322,7 +356,7 @@ public final class StringLookupFactory {
     /**
      * Returns the ConstantStringLookup singleton instance to get the value of a fully-qualified static final value.
      *
-     * @return the DateStringLookup singleton instance.
+     * @return the ConstantStringLookup singleton instance.
      * @since 1.5
      */
     public StringLookup constantStringLookup() {
@@ -366,7 +400,9 @@ public final class StringLookupFactory {
     }
 
     /**
-     * Returns a new InterpolatorStringLookup using the {@link StringLookupFactory default lookups}.
+     * Returns a {@link InterpolatorStringLookup} containing the configured
+     * {@link #addDefaultStringLookups(Map) default lookups}. See the class documentation for
+     * details on how these defaults are configured.
      *
      * @return a new InterpolatorStringLookup.
      */
@@ -375,18 +411,18 @@ public final class StringLookupFactory {
     }
 
     /**
-     * Returns a new InterpolatorStringLookup using the {@link StringLookupFactory default lookups}.
-     * <p>
-     * If {@code addDefaultLookups} is true, the following lookups are used in addition to the ones provided in
-     * {@code stringLookupMap}:
-     * </p>
+     * Returns a new InterpolatorStringLookup. If {@code addDefaultLookups} is {@code true}, the configured
+     * {@link #addDefaultStringLookups(Map) default lookups} are included in addition to the ones
+     * provided in {@code stringLookupMap}. (See the class documentation for details on how default lookups
+     * are configured.)
      *
      * @param stringLookupMap
      *            the map of string lookups.
      * @param defaultStringLookup
-     *            the default string lookup.
+     *            the default string lookup; this lookup is used when a variable cannot be
+     *            resolved using the lookups in {@code stringLookupMap} or the configured default lookups (if enabled)
      * @param addDefaultLookups
-     *            whether to use lookups as described above.
+     *            whether to use default lookups as described above.
      * @return a new InterpolatorStringLookup.
      * @since 1.4
      */
@@ -396,7 +432,9 @@ public final class StringLookupFactory {
     }
 
     /**
-     * Returns a new InterpolatorStringLookup using the {@link StringLookupFactory default lookups}.
+     * Returns a new InterpolatorStringLookup using the given key-value pairs and the configured
+     * {@link #addDefaultStringLookups(Map) default lookups} to resolve variables. (See the class
+     * documentation for details on how default lookups are configured.)
      *
      * @param <V>
      *            the value type the default string lookup's map.
@@ -409,7 +447,9 @@ public final class StringLookupFactory {
     }
 
     /**
-     * Returns a new InterpolatorStringLookup using the {@link StringLookupFactory default lookups}.
+     * Returns a new InterpolatorStringLookup using the given lookup and the configured
+     * {@link #addDefaultStringLookups(Map) default lookups} to resolve variables. (See the class
+     * documentation for details on how default lookups are configured.)
      *
      * @param defaultStringLookup
      *            the default string lookup.
@@ -526,7 +566,9 @@ public final class StringLookupFactory {
     }
 
     /**
-     * Returns the ScriptStringLookup singleton instance.
+     * Returns the ScriptStringLookup singleton instance. NOTE: This lookup is not included
+     * as a {@link #addDefaultStringLookups(Map) default lookup} unless explicitly enabled. See
+     * the class level documentation for details.
      * <p>
      * Looks up the value for the key in the format "ScriptEngineName:Script".
      * </p>
@@ -583,7 +625,9 @@ public final class StringLookupFactory {
     }
 
     /**
-     * Returns the UrlStringLookup singleton instance.
+     * Returns the UrlStringLookup singleton instance. This lookup is not included
+     * as a {@link #addDefaultStringLookups(Map) default lookup} unless explicitly enabled. See
+     * the class level documentation for details.
      * <p>
      * Looks up the value for the key in the format "CharsetName:URL".
      * </p>
@@ -618,4 +662,100 @@ public final class StringLookupFactory {
         return XmlStringLookup.INSTANCE;
     }
 
+    /**
+     * Internal class used to construct the default {@link StringLookup} map used by
+     * {@link StringLookupFactory#addDefaultStringLookups(Map)}.
+     */
+    static final class DefaultStringLookupsHolder {
+
+        /** Singleton instance, initialized with the system properties. */
+        static final DefaultStringLookupsHolder INSTANCE = new DefaultStringLookupsHolder(System.getProperties());
+
+        /** Default string lookup map. */
+        private final Map<String, StringLookup> defaultStringLookups;
+
+        /**
+         * Construct a new instance initialized with the given properties.
+         * @param props initialization properties
+         */
+        DefaultStringLookupsHolder(final Properties props) {
+            final Map<String, StringLookup> lookups =
+                    props.containsKey(StringLookupFactory.DEFAULT_STRING_LOOKUPS_PROPERTY)
+                        ? parseStringLookups(props.getProperty(StringLookupFactory.DEFAULT_STRING_LOOKUPS_PROPERTY))
+                        : createDefaultStringLookups();
+
+            defaultStringLookups = Collections.unmodifiableMap(lookups);
+        }
+
+        /**
+         * Get the default string lookups map.
+         * @return default string lookups map
+         */
+        Map<String, StringLookup> getDefaultStringLookups() {
+            return defaultStringLookups;
+        }
+
+        /**
+         * Create the lookup map used when the user has requested no customization.
+         * @return default lookup map
+         */
+        private static Map<String, StringLookup> createDefaultStringLookups() {
+            final Map<String, StringLookup> lookupMap = new HashMap<>();
+
+            addLookup(DefaultStringLookup.BASE64_DECODER, lookupMap);
+            addLookup(DefaultStringLookup.BASE64_ENCODER, lookupMap);
+            addLookup(DefaultStringLookup.CONST, lookupMap);
+            addLookup(DefaultStringLookup.DATE, lookupMap);
+            addLookup(DefaultStringLookup.ENVIRONMENT, lookupMap);
+            addLookup(DefaultStringLookup.FILE, lookupMap);
+            addLookup(DefaultStringLookup.JAVA, lookupMap);
+            addLookup(DefaultStringLookup.LOCAL_HOST, lookupMap);
+            addLookup(DefaultStringLookup.PROPERTIES, lookupMap);
+            addLookup(DefaultStringLookup.RESOURCE_BUNDLE, lookupMap);
+            addLookup(DefaultStringLookup.SYSTEM_PROPERTIES, lookupMap);
+            addLookup(DefaultStringLookup.URL_DECODER, lookupMap);
+            addLookup(DefaultStringLookup.URL_ENCODER, lookupMap);
+            addLookup(DefaultStringLookup.XML, lookupMap);
+
+            return lookupMap;
+        }
+
+        /**
+         * Construct a lookup map by parsing the given string. The string is expected to contain
+         * comma or space-separated names of values from the {@link DefaultStringLookup} enum. If
+         * the given string is null or empty, an empty map is returned.
+         * @param str string to parse; may be null or empty
+         * @return lookup map parsed from the given string
+         */
+        private static Map<String, StringLookup> parseStringLookups(final String str) {
+            final Map<String, StringLookup> lookupMap = new HashMap<>();
+
+            try {
+                for (final String lookupName : str.split("[\\s,]+")) {
+                    if (!lookupName.isEmpty()) {
+                        addLookup(DefaultStringLookup.valueOf(lookupName.toUpperCase()), lookupMap);
+                    }
+                }
+            } catch (IllegalArgumentException exc) {
+                throw new IllegalArgumentException("Invalid default string lookups definition: " + str, exc);
+            }
+
+            return lookupMap;
+        }
+
+        /**
+         * Add the key and string lookup from {@code lookup} to {@code map}, also adding any additional
+         * key aliases if needed.
+         * @param lookup lookup to add
+         * @param map map to add to
+         */
+        private static void addLookup(final DefaultStringLookup lookup, final Map<String, StringLookup> map) {
+            map.put(lookup.getKey(), lookup.getStringLookup());
+
+            if (DefaultStringLookup.BASE64_DECODER.equals(lookup)) {
+                // "base64" is deprecated in favor of KEY_BASE64_DECODER.
+                map.put("base64", lookup.getStringLookup());
+            }
+        }
+    }
 }

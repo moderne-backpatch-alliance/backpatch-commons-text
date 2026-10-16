@@ -21,6 +21,11 @@ package org.apache.commons.text.lookup;
  * <p>
  * This enum was adapted from Apache Commons Configuration 2.4-SNAPSHOT.
  * </p>
+ * <p><strong>NOTE:</strong> Starting in version 1.10.0, not all lookups defined in this class are
+ * included by default in the
+ * {@link StringLookupFactory#addDefaultStringLookups(java.util.Map) StringLookupFactory.addDefaultStringLookups}
+ * method. See the {@link StringLookupFactory} class documentation for details.
+ * </p>
  *
  * @see StringLookupFactory
  * @see StringLookup
@@ -29,82 +34,114 @@ package org.apache.commons.text.lookup;
 public enum DefaultStringLookup {
 
     /**
-     * The lookup for Base64 decoding.
+     * The lookup for Base64 decoding using the key {@code "base64Decoder"}.
+     * @see StringLookupFactory#KEY_BASE64_DECODER
+     * @see StringLookupFactory#base64DecoderStringLookup()
      */
     BASE64_DECODER(StringLookupFactory.KEY_BASE64_DECODER, StringLookupFactory.INSTANCE.base64DecoderStringLookup()),
 
     /**
-     * The lookup for Base64 decoding.
+     * The lookup for Base64 decoding using the key {@code "base64Encoder"}.
+     * @see StringLookupFactory#KEY_BASE64_ENCODER
+     * @see StringLookupFactory#base64EncoderStringLookup()
      */
     BASE64_ENCODER(StringLookupFactory.KEY_BASE64_ENCODER, StringLookupFactory.INSTANCE.base64EncoderStringLookup()),
 
     /**
-     * The lookup for constants.
+     * The lookup for Java static class member constants using the key {@code "const"}.
+     * @see StringLookupFactory#KEY_CONST
+     * @see StringLookupFactory#constantStringLookup()
      */
     CONST(StringLookupFactory.KEY_CONST, StringLookupFactory.INSTANCE.constantStringLookup()),
 
     /**
-     * The lookup for dates.
+     * The lookup for formatting the current date using the key {@code "date"}.
+     * @see StringLookupFactory#KEY_DATE
+     * @see StringLookupFactory#dateStringLookup()
      */
     DATE(StringLookupFactory.KEY_DATE, StringLookupFactory.INSTANCE.dateStringLookup()),
 
     /**
-     * The lookup for environment properties.
+     * The lookup for environment properties using the key {@code "env"}.
+     * @see StringLookupFactory#KEY_ENV
+     * @see StringLookupFactory#environmentVariableStringLookup()
      */
     ENVIRONMENT(StringLookupFactory.KEY_ENV, StringLookupFactory.INSTANCE.environmentVariableStringLookup()),
 
     /**
-     * The lookup for files.
+     * The lookup for files using the key {@code "file"}.
+     * @see StringLookupFactory#KEY_FILE
+     * @see StringLookupFactory#fileStringLookup()
      */
     FILE(StringLookupFactory.KEY_FILE, StringLookupFactory.INSTANCE.fileStringLookup()),
 
     /**
-     * The lookup for Java platform information.
+     * The lookup for Java platform information using the key {@code "java"}.
+     * @see StringLookupFactory#KEY_JAVA
+     * @see StringLookupFactory#javaPlatformStringLookup()
      */
     JAVA(StringLookupFactory.KEY_JAVA, StringLookupFactory.INSTANCE.javaPlatformStringLookup()),
 
     /**
-     * The lookup for localhost information.
+     * The lookup for localhost information using the key {@code "localhost"}.
+     * @see StringLookupFactory#KEY_LOCALHOST
+     * @see StringLookupFactory#localHostStringLookup()
      */
     LOCAL_HOST(StringLookupFactory.KEY_LOCALHOST, StringLookupFactory.INSTANCE.localHostStringLookup()),
 
     /**
-     * The lookup for properties.
+     * The lookup for properties using the key {@code "properties"}.
+     * @see StringLookupFactory#KEY_PROPERTIES
+     * @see StringLookupFactory#propertiesStringLookup()
      */
     PROPERTIES(StringLookupFactory.KEY_PROPERTIES, StringLookupFactory.INSTANCE.propertiesStringLookup()),
 
     /**
-     * The lookup for resource bundles.
+     * The lookup for resource bundles using the key {@code "resourceBundle"}.
+     * @see StringLookupFactory#KEY_RESOURCE_BUNDLE
+     * @see StringLookupFactory#resourceBundleStringLookup()
      */
     RESOURCE_BUNDLE(StringLookupFactory.KEY_RESOURCE_BUNDLE, StringLookupFactory.INSTANCE.resourceBundleStringLookup()),
 
     /**
-     * The lookup for scripts.
+     * The lookup for scripts using the key {@code "script"}.
+     * @see StringLookupFactory#KEY_SCRIPT
+     * @see StringLookupFactory#scriptStringLookup()
      */
     SCRIPT(StringLookupFactory.KEY_SCRIPT, StringLookupFactory.INSTANCE.scriptStringLookup()),
 
     /**
-     * The lookup for system properties.
+     * The lookup for system properties using the key {@code "sys"}.
+     * @see StringLookupFactory#KEY_SYS
+     * @see StringLookupFactory#systemPropertyStringLookup()
      */
     SYSTEM_PROPERTIES(StringLookupFactory.KEY_SYS, StringLookupFactory.INSTANCE.systemPropertyStringLookup()),
 
     /**
-     * The lookup for URLs.
+     * The lookup for URLs using the key {@code "url"}.
+     * @see StringLookupFactory#KEY_URL
+     * @see StringLookupFactory#urlStringLookup()
      */
     URL(StringLookupFactory.KEY_URL, StringLookupFactory.INSTANCE.urlStringLookup()),
 
     /**
-     * The lookup for URL decoding.
+     * The lookup for URL decoding using the key {@code "urlDecoder"}.
+     * @see StringLookupFactory#KEY_URL_DECODER
+     * @see StringLookupFactory#urlDecoderStringLookup()
      */
     URL_DECODER(StringLookupFactory.KEY_URL_DECODER, StringLookupFactory.INSTANCE.urlDecoderStringLookup()),
 
     /**
-     * The lookup for URL decoding.
+     * The lookup for URL decoding using the key {@code "urlEncoder"}.
+     * @see StringLookupFactory#KEY_URL_ENCODER
+     * @see StringLookupFactory#urlEncoderStringLookup()
      */
     URL_ENCODER(StringLookupFactory.KEY_URL_ENCODER, StringLookupFactory.INSTANCE.urlEncoderStringLookup()),
 
     /**
-     * The lookup for URL decoding.
+     * The lookup for URL decoding using the key {@code "xml"}.
+     * @see StringLookupFactory#KEY_XML
+     * @see StringLookupFactory#xmlStringLookup()
      */
     XML(StringLookupFactory.KEY_XML, StringLookupFactory.INSTANCE.xmlStringLookup());
 
