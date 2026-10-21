@@ -1,0 +1,21 @@
+schema: osera-patch-evidence/0.1.0
+producer: moderne
+release: 1.6.1-backpatch-00001
+baseline: v1.6+backpatch.baseline
+fixes:
+  - cve: CVE-2022-42889
+    upstream_fix_url: https://github.com/apache/commons-text/commit/b9b40b903e2d1f9935039803c9852439576780ea
+    advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2022-42889
+    patch_commit_url: https://github.com/moderne-backpatch-alliance/backpatch-commons-text/commit/5c760df
+    basis: adapted
+    artifacts:
+      - org.apache.commons:commons-text
+    note: New in this release; adapted onto 1.6; fixed at 1.6.1-backpatch-00001 (backpatch-commons-text@5c760df).
+tests:
+  commit: 5c760df810b9609ee15fbe1bd3e4f492eb59ebd6
+  command: JAVA_HOME=<jdk> mvn -B clean test
+  runtime: Azul Zulu (Java 11.0.20), Apache Maven 3.9.16, macOS aarch64
+  report: commons-text-1.6.1-backpatch-00001-tests.zip
+  report_sha256: d957486c7aec5511dd07d8d2f4864bb7e1cbaad0c0a63a990b1d1a9c42655f4e
+  result: pass
+  note: the full suite at the tested commit, 971 tests run, 0 failed, 0 skipped; the regression tests for CVE-2022-42889 are StringLookupFactoryTest,StringSubstitutorWithInterpolatorStringLookupTest
