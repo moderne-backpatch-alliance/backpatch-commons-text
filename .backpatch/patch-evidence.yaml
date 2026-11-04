@@ -1,6 +1,6 @@
 schema: osera-patch-evidence/0.1.0
 producer: moderne
-release: 1.6.1-backpatch-00001
+release: 1.6.1-backpatch-00002
 baseline: v1.6+backpatch.baseline
 fixes:
   - cve: CVE-2022-42889
@@ -10,12 +10,11 @@ fixes:
     basis: adapted
     artifacts:
       - org.apache.commons:commons-text
-    note: New in this release; adapted onto 1.6; fixed at 1.6.1-backpatch-00001 (backpatch-commons-text@5c760df).
+    note: Carried from 1.6.1-backpatch-00001; ported onto 1.6; fixed at 1.6.1-backpatch-00001 (backpatch-commons-text@5c760df).
 tests:
-  commit: 5c760df810b9609ee15fbe1bd3e4f492eb59ebd6
-  command: JAVA_HOME=<jdk> mvn -B clean test
-  runtime: Azul Zulu (Java 11.0.20), Apache Maven 3.9.16, macOS aarch64
-  report: commons-text-1.6.1-backpatch-00001-tests.zip
-  report_sha256: d957486c7aec5511dd07d8d2f4864bb7e1cbaad0c0a63a990b1d1a9c42655f4e
+  commit: 5e1f6a993ce58af2f6126392756bcfdd52213ecc
+  command: none in this repository
+  runtime: none, no build or test ran for this release
+  report: carried, see the evidence of the release named in the note
   result: pass
-  note: the full suite at the tested commit, 971 tests run, 0 failed, 0 skipped; the regression tests for CVE-2022-42889 are StringLookupFactoryTest,StringSubstitutorWithInterpolatorStringLookupTest
+  note: "this release is a tooling update, it carries no new fix, nothing ran here; its test provenance is tooling-2026-11-03-commons-text-1.6: a tooling update of moderne-backpatch-alliance/backpatch-commons-text at v1.6.1-backpatch-00001, whose .backpatch/patch-evidence.yaml says what ran"
